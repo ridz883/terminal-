@@ -13,6 +13,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/php/php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/ruby/ruby.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/lua/lua.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/dart/dart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/go/go.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/rust/rust.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/swift/swift.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/yaml/yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/shell/shell.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/r/r.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/perl/perl.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/scala/scala.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -427,11 +443,31 @@ Saya bisa bantu:
     <label class="mlabel">Nama File</label>
     <input class="minput" id="new-name" placeholder="contoh: index" oninput="this.value=this.value.replace(/[^a-zA-Z0-9_-]/g,'')">
     <label class="mlabel">Tipe File</label>
-    <div class="ext-grid">
+    <div class="ext-grid" style="grid-template-columns:repeat(5,1fr);gap:6px">
       <div class="ext-opt sel" data-ext="html" onclick="selExt(this)"><span class="eo-emoji">🟧</span><span class="eo-label">.html</span></div>
-      <div class="ext-opt" data-ext="css" onclick="selExt(this)"><span class="eo-emoji">🟪</span><span class="eo-label">.css</span></div>
-      <div class="ext-opt" data-ext="js" onclick="selExt(this)"><span class="eo-emoji">🟨</span><span class="eo-label">.js</span></div>
-      <div class="ext-opt" data-ext="py" onclick="selExt(this)"><span class="eo-emoji">🟩</span><span class="eo-label">.py</span></div>
+      <div class="ext-opt" data-ext="css"  onclick="selExt(this)"><span class="eo-emoji">🟪</span><span class="eo-label">.css</span></div>
+      <div class="ext-opt" data-ext="js"   onclick="selExt(this)"><span class="eo-emoji">🟨</span><span class="eo-label">.js</span></div>
+      <div class="ext-opt" data-ext="ts"   onclick="selExt(this)"><span class="eo-emoji">🟦</span><span class="eo-label">.ts</span></div>
+      <div class="ext-opt" data-ext="py"   onclick="selExt(this)"><span class="eo-emoji">🟩</span><span class="eo-label">.py</span></div>
+      <div class="ext-opt" data-ext="php"  onclick="selExt(this)"><span class="eo-emoji">🔵</span><span class="eo-label">.php</span></div>
+      <div class="ext-opt" data-ext="rb"   onclick="selExt(this)"><span class="eo-emoji">🔴</span><span class="eo-label">.rb</span></div>
+      <div class="ext-opt" data-ext="lua"  onclick="selExt(this)"><span class="eo-emoji">🔷</span><span class="eo-label">.lua</span></div>
+      <div class="ext-opt" data-ext="dart" onclick="selExt(this)"><span class="eo-emoji">🩵</span><span class="eo-label">.dart</span></div>
+      <div class="ext-opt" data-ext="java" onclick="selExt(this)"><span class="eo-emoji">🟠</span><span class="eo-label">.java</span></div>
+      <div class="ext-opt" data-ext="c"    onclick="selExt(this)"><span class="eo-emoji">⬛</span><span class="eo-label">.c</span></div>
+      <div class="ext-opt" data-ext="cpp"  onclick="selExt(this)"><span class="eo-emoji">⬛</span><span class="eo-label">.cpp</span></div>
+      <div class="ext-opt" data-ext="go"   onclick="selExt(this)"><span class="eo-emoji">🩵</span><span class="eo-label">.go</span></div>
+      <div class="ext-opt" data-ext="rs"   onclick="selExt(this)"><span class="eo-emoji">🟤</span><span class="eo-label">.rs</span></div>
+      <div class="ext-opt" data-ext="swift" onclick="selExt(this)"><span class="eo-emoji">🟠</span><span class="eo-label">.swift</span></div>
+      <div class="ext-opt" data-ext="sql"  onclick="selExt(this)"><span class="eo-emoji">🩶</span><span class="eo-label">.sql</span></div>
+      <div class="ext-opt" data-ext="xml"  onclick="selExt(this)"><span class="eo-emoji">🟢</span><span class="eo-label">.xml</span></div>
+      <div class="ext-opt" data-ext="yaml" onclick="selExt(this)"><span class="eo-emoji">🟡</span><span class="eo-label">.yaml</span></div>
+      <div class="ext-opt" data-ext="sh"   onclick="selExt(this)"><span class="eo-emoji">⬜</span><span class="eo-label">.sh</span></div>
+      <div class="ext-opt" data-ext="md"   onclick="selExt(this)"><span class="eo-emoji">🩶</span><span class="eo-label">.md</span></div>
+      <div class="ext-opt" data-ext="r"    onclick="selExt(this)"><span class="eo-emoji">🔵</span><span class="eo-label">.r</span></div>
+      <div class="ext-opt" data-ext="pl"   onclick="selExt(this)"><span class="eo-emoji">🟣</span><span class="eo-label">.pl</span></div>
+      <div class="ext-opt" data-ext="scala" onclick="selExt(this)"><span class="eo-emoji">🔴</span><span class="eo-label">.scala</span></div>
+      <div class="ext-opt" data-ext="json" onclick="selExt(this)"><span class="eo-emoji">⬜</span><span class="eo-label">.json</span></div>
     </div>
     <div class="mbtns">
       <button class="mbtn cancel" onclick="closeModal('modal-new')">Batal</button>
@@ -506,12 +542,12 @@ Saya bisa bantu:
 
     <div style="display:flex;gap:8px;margin-bottom:12px">
       <div style="flex:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:12px;text-align:center">
-        <div style="font-size:20px;font-weight:800;color:var(--p)">5+</div>
-        <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Fitur</div>
+        <div style="font-size:20px;font-weight:800;color:var(--p)">24</div>
+        <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Bahasa</div>
       </div>
       <div style="flex:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:12px;text-align:center">
-        <div style="font-size:20px;font-weight:800;color:var(--p)">4</div>
-        <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Bahasa</div>
+        <div style="font-size:20px;font-weight:800;color:var(--p)">5+</div>
+        <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Fitur</div>
       </div>
       <div style="flex:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:12px;text-align:center">
         <div style="font-size:20px;font-weight:800;color:var(--p)">1</div>
@@ -545,14 +581,59 @@ Saya bisa bantu:
 const GROQ_KEY = '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';
 
 // ══ DATA ══
-const EXT_COL  = {js:'#f59e0b',ts:'#0ea5e9',html:'#ef4444',css:'#8b5cf6',py:'#22c55e',json:'#6b7280'};
-const EXT_ICON = {js:'JS',ts:'TS',html:'HT',css:'CS',py:'PY',json:'{}'};
-const EXT_MODE = {js:'javascript',ts:'javascript',html:'htmlmixed',css:'css',py:'python'};
-const EMOJI    = {js:'🟨',ts:'🟦',html:'🟧',css:'🟪',py:'🟩',json:'⬜'};
-const TMPLS    = {
-  html:`<!DOCTYPE html>\n<html lang="id">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Halaman Baru</title>\n  <style>\n    * { box-sizing: border-box; margin: 0; padding: 0; }\n    body {\n      font-family: sans-serif;\n      background: #f0f2f8;\n      color: #1a1b2e;\n      padding: 40px 20px;\n    }\n    h1 { color: #5b4ef8; margin-bottom: 12px; }\n  </style>\n</head>\n<body>\n  <h1>Hello World! 👋</h1>\n  <p>Tulis konten di sini.</p>\n</body>\n</html>`,
-  js:`'use strict';\n\n// ── Main ──\nfunction main() {\n  console.log('App started! 🚀');\n}\n\nmain();`,
-  css:`/* Stylesheet */\n\n:root {\n  --primary: #5b4ef8;\n  --bg: #f0f2f8;\n  --text: #1a1b2e;\n}\n\nbody {\n  font-family: sans-serif;\n  background: var(--bg);\n  color: var(--text);\n  padding: 20px;\n}`
+const EXT_COL  = {
+  js:'#f59e0b',ts:'#0ea5e9',html:'#ef4444',css:'#8b5cf6',py:'#22c55e',
+  php:'#6366f1',rb:'#dc2626',lua:'#2563eb',dart:'#06b6d4',
+  java:'#f97316',c:'#6b7280',cpp:'#6b7280',go:'#00add8',rs:'#f97316',swift:'#f97316',
+  sql:'#0891b2',xml:'#16a34a',yaml:'#ca8a04',sh:'#1e293b',
+  md:'#475569',r:'#276dc3',pl:'#6366f1',scala:'#dc2626',json:'#6b7280'
+};
+const EXT_ICON = {
+  js:'JS',ts:'TS',html:'HT',css:'CS',py:'PY',
+  php:'PH',rb:'RB',lua:'LU',dart:'DA',
+  java:'JV',c:'C ',cpp:'C+',go:'GO',rs:'RS',swift:'SW',
+  sql:'SQ',xml:'XM',yaml:'YM',sh:'SH',
+  md:'MD',r:'R ',pl:'PL',scala:'SC',json:'{}'
+};
+const EXT_MODE = {
+  js:'javascript',ts:'javascript',html:'htmlmixed',css:'css',py:'python',
+  php:'php',rb:'ruby',lua:'lua',dart:'dart',
+  java:'text/x-java',c:'text/x-csrc',cpp:'text/x-c++src',go:'go',rs:'rust',swift:'swift',
+  sql:'sql',xml:'xml',yaml:'yaml',sh:'shell',
+  md:'markdown',r:'r',pl:'perl',scala:'text/x-scala',json:'application/json'
+};
+const EMOJI = {
+  js:'🟨',ts:'🟦',html:'🟧',css:'🟪',py:'🟩',
+  php:'🔵',rb:'🔴',lua:'🔷',dart:'🩵',
+  java:'🟠',c:'⬛',cpp:'⬛',go:'🩵',rs:'🟤',swift:'🟠',
+  sql:'🩶',xml:'🟢',yaml:'🟡',sh:'⬜',
+  md:'🩶',r:'🔵',pl:'🟣',scala:'🔴',json:'⬜'
+};
+const TMPLS = {
+  html:`<!DOCTYPE html>\n<html lang="id">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Halaman Baru</title>\n  <style>\n    * { box-sizing: border-box; margin: 0; padding: 0; }\n    body { font-family: sans-serif; background: #f0f2f8; color: #1a1b2e; padding: 40px 20px; }\n    h1 { color: #5b4ef8; margin-bottom: 12px; }\n  </style>\n</head>\n<body>\n  <h1>Hello World! 👋</h1>\n  <p>Tulis konten di sini.</p>\n</body>\n</html>`,
+  js:`'use strict';\n\nfunction main() {\n  console.log('App started! 🚀');\n}\n\nmain();`,
+  ts:`// TypeScript\ninterface User {\n  name: string;\n  age: number;\n}\n\nconst greet = (user: User): string => {\n  return \`Hello, \${user.name}!\`;\n};\n\nconsole.log(greet({ name: 'World', age: 20 }));`,
+  css:`/* Stylesheet */\n\n:root {\n  --primary: #5b4ef8;\n  --bg: #f0f2f8;\n  --text: #1a1b2e;\n}\n\nbody {\n  font-family: sans-serif;\n  background: var(--bg);\n  color: var(--text);\n  padding: 20px;\n}`,
+  py:`# Python\n\ndef main():\n    print("Hello, World! 🐍")\n    nums = [1, 2, 3, 4, 5]\n    print(f"Sum: {sum(nums)}")\n    print(f"Avg: {sum(nums)/len(nums)}")\n\nmain()`,
+  php:`<?php\n// PHP by ridzz\n\nfunction greet(string $name): string {\n    return "Hello, $name! 🐘";\n}\n\necho greet("World");\n$arr = [1, 2, 3, 4, 5];\necho "\nSum: " . array_sum($arr);\n?>`,
+  rb:`# Ruby by ridzz\n\ndef greet(name)\n  "Hello, #{name}! 💎"\nend\n\nputs greet("World")\narr = [1, 2, 3, 4, 5]\nputs "Sum: #{arr.sum}"`,
+  lua:`-- Lua by ridzz\n\nfunction greet(name)\n  return "Hello, " .. name .. "! 🌙"\nend\n\nprint(greet("World"))\nlocal nums = {1, 2, 3, 4, 5}\nlocal sum = 0\nfor _, v in ipairs(nums) do sum = sum + v end\nprint("Sum: " .. sum)`,
+  dart:`// Dart by ridzz\nvoid main() {\n  print('Hello, World! 🎯');\n  var nums = [1, 2, 3, 4, 5];\n  var sum = nums.reduce((a, b) => a + b);\n  print('Sum: $sum');\n}`,
+  java:`// Java by ridzz\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World! ☕");\n        int[] nums = {1, 2, 3, 4, 5};\n        int sum = 0;\n        for (int n : nums) sum += n;\n        System.out.println("Sum: " + sum);\n    }\n}`,
+  c:`// C by ridzz\n#include <stdio.h>\n\nint main() {\n    printf("Hello, World! ⚙️\\n");\n    int nums[] = {1, 2, 3, 4, 5};\n    int sum = 0;\n    for (int i = 0; i < 5; i++) sum += nums[i];\n    printf("Sum: %d\\n", sum);\n    return 0;\n}`,
+  cpp:`// C++ by ridzz\n#include <iostream>\n#include <vector>\n#include <numeric>\nusing namespace std;\n\nint main() {\n    cout << "Hello, World! 🔧" << endl;\n    vector<int> nums = {1, 2, 3, 4, 5};\n    cout << "Sum: " << accumulate(nums.begin(), nums.end(), 0) << endl;\n    return 0;\n}`,
+  go:`// Go by ridzz\npackage main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World! 🐹")\n    nums := []int{1, 2, 3, 4, 5}\n    sum := 0\n    for _, v := range nums { sum += v }\n    fmt.Printf("Sum: %d\\n", sum)\n}`,
+  rs:`// Rust by ridzz\nfn main() {\n    println!("Hello, World! 🦀");\n    let nums = vec![1, 2, 3, 4, 5];\n    let sum: i32 = nums.iter().sum();\n    println!("Sum: {}", sum);\n}`,
+  swift:`// Swift by ridzz\nimport Foundation\n\nprint("Hello, World! 🍎")\nlet nums = [1, 2, 3, 4, 5]\nlet sum = nums.reduce(0, +)\nprint("Sum: \(sum)")`,
+  sql:`-- SQL by ridzz\nCREATE TABLE users (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  name TEXT NOT NULL,\n  email TEXT UNIQUE,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nINSERT INTO users (name, email) VALUES\n  ('ridzz', 'ridzz@example.com'),\n  ('Alice', 'alice@example.com');\n\nSELECT * FROM users ORDER BY created_at DESC;`,
+  xml:`<?xml version="1.0" encoding="UTF-8"?>\n<!-- XML by ridzz -->\n<root>\n  <app>\n    <name>VOID IDE</name>\n    <creator>ridzz</creator>\n    <version>2.0</version>\n  </app>\n  <items>\n    <item id="1">Hello World</item>\n    <item id="2">VOID IDE by ridzz</item>\n  </items>\n</root>`,
+  yaml:`# YAML by ridzz\napp:\n  name: VOID IDE\n  version: 2.0\n  creator: ridzz\n\nfeatures:\n  - code editor\n  - live preview\n  - ai assistant\n  - multi language\n\nstatus: active`,
+  sh:`#!/bin/bash\n# Shell Script by ridzz\n\necho "Hello, World! 🐚"\n\nNAME="ridzz"\necho "Creator: $NAME"\n\nfor i in 1 2 3 4 5; do\n  echo "Number: $i"\ndone`,
+  md:`# VOID IDE\n\n> Web-based code editor by **ridzz**\n\n## Fitur\n\n- ✏️ Syntax highlighting\n- 🖥️ Live preview\n- 🤖 AI assistant\n- 📱 Mobile friendly\n\n## Penggunaan\n\nPilih bahasa, tulis kode, dan tap **Run**!\n\n---\n*Made with ❤️ by ridzz*`,
+  r:`# R by ridzz\ncat("Hello, World! 📊\n")\nnums <- c(1, 2, 3, 4, 5)\ncat("Sum:", sum(nums), "\n")\ncat("Mean:", mean(nums), "\n")\ncat("SD:", sd(nums), "\n")`,
+  pl:`#!/usr/bin/perl\n# Perl by ridzz\nuse strict;\nuse warnings;\n\nprint "Hello, World! 🐪\n";\nmy @nums = (1, 2, 3, 4, 5);\nmy $sum = 0;\n$sum += $_ for @nums;\nprint "Sum: $sum\n";`,
+  scala:`// Scala by ridzz\nobject Main extends App {\n  println("Hello, World! ⚡")\n  val nums = List(1, 2, 3, 4, 5)\n  println(s"Sum: \${nums.sum}")\n  println(s"Avg: \${nums.sum.toDouble / nums.length}")\n}`,
+  json:`{\n  "app": "VOID IDE",\n  "creator": "ridzz",\n  "version": "2.0",\n  "features": [\n    "code editor",\n    "live preview",\n    "ai assistant",\n    "multi language"\n  ],\n  "languages": 20\n}`
 };
 
 let files = [
