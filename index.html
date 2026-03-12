@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>VOID IDE</title>
+<title>VOID IDE by ridzz</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
@@ -38,6 +38,7 @@ html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif
 #chip-name{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #run-btn{background:linear-gradient(135deg,var(--p),#7c6af7);border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;padding:8px 15px;border-radius:10px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;gap:5px;box-shadow:0 3px 12px rgba(91,78,248,.35);transition:all .18s;}
 #run-btn:active{transform:scale(.93);}
+#ridzz-chip{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--p);background:var(--pdim);border:1.5px solid var(--pring);border-radius:99px;padding:3px 8px;flex-shrink:0;}
 
 /* AI STATUS BADGE */
 #ai-status-badge{position:absolute;right:12px;bottom:-10px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;border:1.5px solid;letter-spacing:.04em;text-transform:uppercase;}
@@ -266,14 +267,14 @@ html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif
 <div id="topbar">
   <div class="logo">
     <div class="logo-icon">⚡</div>
-    <span class="logo-text">VOID</span>
+    <span class="logo-text">VOID IDE</span>
   </div>
   <div id="file-chip" onclick="openDrawer()">
     <span id="chip-icon" style="font-size:13px">🟧</span>
     <span id="chip-name">index.html</span>
     <span style="font-size:10px;color:var(--t3);flex-shrink:0;margin-left:2px">▾</span>
   </div>
-  <button id="run-btn" onclick="runCode()">▶ Run</button>
+  <span id="ridzz-chip">by ridzz</span><button id="run-btn" onclick="runCode()">▶ Run</button>
 </div>
 
 <div id="screens">
@@ -283,7 +284,7 @@ html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif
       <div id="add-tab" onclick="openNewModal()">＋ New</div>
     </div>
     <div id="ed-actions">
-      <button class="ea danger" onclick="openClearModal()">🗑 Hapus Semua</button>
+      <button class="ea" onclick="openAboutModal()" style="color:var(--p);border-color:var(--pring);background:var(--pdim)">⚡ ridzz</button><button class="ea danger" onclick="openClearModal()">🗑 Hapus Semua</button>
       <div class="ea-sep"></div>
       <button class="ea" onclick="copyAll()">📋 Copy</button>
       <button class="ea" onclick="insertTemplate()">📄 Template</button>
@@ -329,6 +330,7 @@ html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif
         <div class="pe-icon">🖥️</div>
         <div class="pe-text">Preview kosong</div>
         <div class="pe-sub">Buka file HTML lalu tap ▶ Run</div>
+      <div style="margin-top:12px;font-size:10px;color:var(--t3);font-weight:700;letter-spacing:.04em">⚡ VOID IDE by ridzz</div>
       </div>
     </div>
     <div id="prev-device-bar">
@@ -353,6 +355,7 @@ html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif
         <div class="es-icon">⚡</div>
         <div class="es-text">Belum ada output</div>
         <div class="es-sub">Tap ▶ Run untuk jalankan JS</div>
+      <div style="margin-top:16px;font-size:10px;color:var(--t3);font-weight:700;letter-spacing:.04em">⚡ VOID IDE by ridzz</div>
       </div>
     </div>
   </div>
@@ -370,7 +373,7 @@ html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif
       <button class="ctx-btn" onclick="attachCode()">📎 Kode</button>
     </div>
     <div id="ai-msgs">
-      <div class="ab bot" style="border-color:rgba(91,78,248,.18);background:rgba(91,78,248,.04)">Halo! Saya <strong style="color:var(--p)">VOID AI</strong> 👋
+      <div class="ab bot" style="border-color:rgba(91,78,248,.18);background:rgba(91,78,248,.04)">Halo! Saya <strong style="color:var(--p)">VOID AI</strong> — asisten milik <strong style="color:var(--p)">ridzz</strong> 👋
 
 Menggunakan <strong style="color:#6d28d9">Groq / Llama 3.1</strong> sebagai AI utama ⚡<br>Backup otomatis ke <strong style="color:#b45309">Pollinations</strong> jika Groq gagal.
 
@@ -396,7 +399,7 @@ Saya bisa bantu:
 
 <!-- BOTTOM NAV -->
 <div id="bnav">
-  <div class="nb on" id="nb-ed" onclick="go('ed')">
+  <div class="nb on" id="nb-ed" onclick="go('ed')" title="ridzz IDE">
     <div class="nb-pip">✏️</div><span class="nb-label">Editor</span>
   </div>
   <div class="nb" id="nb-prev" onclick="go('prev')">
@@ -411,6 +414,7 @@ Saya bisa bantu:
     <div class="nb-pip">🤖</div><span class="nb-label">AI</span>
     <div class="nb-badge" id="ai-badge"></div>
   </div>
+  <div style="padding:12px 16px;border-top:1.5px solid var(--border);text-align:center;font-size:10px;color:var(--t3);font-weight:700;letter-spacing:.04em">⚡ VOID IDE · by <span style='color:var(--p)'>ridzz</span></div>
 </div>
 
 <!-- MODAL: NEW FILE -->
@@ -464,6 +468,62 @@ Saya bisa bantu:
       <button class="mbtn cancel" onclick="closeModal('modal-wrap')">Batal</button>
       <button class="mbtn ok" onclick="doWrap()">⚡ Wrap</button>
     </div>
+  </div>
+</div>
+
+
+<!-- MODAL: ABOUT -->
+<div class="modal-bg" id="modal-about">
+  <div class="msheet" onclick="event.stopPropagation()" style="max-height:85vh;overflow-y:auto;">
+    <div class="mhandle"></div>
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="width:64px;height:64px;background:linear-gradient(135deg,var(--p),#a78bfa);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;box-shadow:0 8px 24px rgba(91,78,248,.35)">⚡</div>
+      <div style="font-size:22px;font-weight:800;background:linear-gradient(135deg,var(--p),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.02em">VOID IDE</div>
+      <div style="font-size:12px;color:var(--t3);margin-top:3px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">by ridzz</div>
+    </div>
+
+    <div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Tentang Aplikasi</div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.7">
+        <strong style="color:var(--text)">VOID IDE</strong> adalah web-based code editor yang dibuat oleh <strong style="color:var(--p)">ridzz</strong>. 
+        Editor ini mendukung berbagai bahasa pemrograman dengan fitur syntax highlighting, live preview HTML, 
+        console output, dan asisten AI terintegrasi.
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Fitur Utama</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${['✏️ Code editor dengan syntax highlighting','🖥️ Live preview HTML/CSS/JS','⚡ Console output & JS runner','🤖 AI assistant (Groq + Pollinations)','📱 Mobile-friendly UI','📁 Multi-file support'].map(f=>`<div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2)">${f}</div>`).join('')}
+      </div>
+    </div>
+
+    <div style="background:linear-gradient(135deg,rgba(91,78,248,.08),rgba(167,139,250,.08));border:1.5px solid var(--pring);border-radius:14px;padding:16px;margin-bottom:18px;text-align:center">
+      <div style="font-size:11px;font-weight:700;color:var(--p);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Kreator</div>
+      <div style="font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--p),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">ridzz</div>
+      <div style="font-size:12px;color:var(--t3);margin-top:4px">Web Developer & Builder</div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <div style="flex:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:800;color:var(--p)">5+</div>
+        <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Fitur</div>
+      </div>
+      <div style="flex:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:800;color:var(--p)">4</div>
+        <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Bahasa</div>
+      </div>
+      <div style="flex:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:800;color:var(--p)">1</div>
+        <div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.04em">File</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;font-size:11px;color:var(--t3);margin-bottom:16px">
+      ⚡ Made with passion by <strong style="color:var(--p)">ridzz</strong> · VOID IDE v2.0
+    </div>
+
+    <button class="mbtn ok" onclick="closeModal('modal-about')" style="width:100%">Tutup</button>
   </div>
 </div>
 
@@ -600,6 +660,7 @@ function go(t){
 }
 
 // ══ MODALS ══
+function openAboutModal(){ openModal('modal-about'); }
 function openModal(id){ document.getElementById(id).classList.add('on'); }
 function closeModal(id){ document.getElementById(id).classList.remove('on'); }
 function closeAllModals(){ document.querySelectorAll('.modal-bg').forEach(m=>m.classList.remove('on')); }
@@ -788,7 +849,7 @@ function updateAIBadge(provider){
 }
 
 async function callGroq(messages){
-  const SYS = 'Kamu adalah VOID AI, asisten coding dalam web IDE. Jawab singkat, padat, dan helpful. Gunakan bahasa yang sama dengan user (Indonesia/English). Format kode dengan markdown backticks.';
+  const SYS = 'Kamu adalah VOID AI, asisten coding dalam VOID IDE yang dibuat oleh ridzz. Jika ditanya tentang siapa pembuatmu, siapa pemilikmu, atau tentang aplikasi ini, jawab bahwa kamu adalah VOID AI milik ridzz, dan VOID IDE dibuat oleh ridzz. Jawab singkat, padat, dan helpful. Gunakan bahasa yang sama dengan user (Indonesia/English). Format kode dengan markdown backticks.';
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {'Content-Type':'application/json', 'Authorization': `Bearer ${GROQ_KEY}`},
@@ -804,7 +865,7 @@ async function callGroq(messages){
 }
 
 async function callPollinations(messages){
-  const SYS = 'Kamu adalah VOID AI, asisten coding. Jawab singkat, helpful. Gunakan bahasa yang sama dengan user. Format kode dengan markdown backticks.';
+  const SYS = 'Kamu adalah VOID AI milik ridzz, asisten coding dalam VOID IDE buatan ridzz. Jika ditanya siapa pembuatmu atau tentang aplikasi ini, jawab bahwa VOID IDE dibuat oleh ridzz. Jawab singkat, helpful. Gunakan bahasa yang sama dengan user. Format kode dengan markdown backticks.';
   const res = await fetch('https://text.pollinations.ai/openai', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
