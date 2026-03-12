@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VOID IDE</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f8;--bg1:#fff;--bg2:#f7f8fc;--bg3:#eef0f8;--bg4:#e4e7f5;
+  --border:#dde1f0;
+  --p:#5b4ef8;--p2:#7c6af7;--pdim:rgba(91,78,248,.10);--pring:rgba(91,78,248,.22);
+  --green:#22c55e;--red:#ef4444;--amber:#f59e0b;--sky:#0ea5e9;
+  --text:#1a1b2e;--t2:#5a5d7a;--t3:#9ea3be;
+  --top:50px;--nav:62px;
+  --shadow:0 2px 12px rgba(91,78,248,.08);
+  --shadow-lg:0 8px 30px rgba(91,78,248,.14);
+}
+html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;}
+
+/* TOPBAR */
+#topbar{position:fixed;top:0;left:0;right:0;height:var(--top);background:var(--bg1);border-bottom:1.5px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:9px;z-index:100;box-shadow:0 1px 8px rgba(91,78,248,.06);}
+.logo{font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--p),#a78bfa);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 3px 10px rgba(91,78,248,.35);}
+.logo-text{background:linear-gradient(135deg,var(--p),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.02em;}
+#file-chip{flex:1;min-width:0;display:flex;align-items:center;gap:6px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:7px 10px;cursor:pointer;overflow:hidden;transition:all .18s;}
+#file-chip:active{border-color:var(--p);background:var(--pdim);}
+#chip-name{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#run-btn{background:linear-gradient(135deg,var(--p),#7c6af7);border:none;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;padding:8px 15px;border-radius:10px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;gap:5px;box-shadow:0 3px 12px rgba(91,78,248,.35);transition:all .18s;}
+#run-btn:active{transform:scale(.93);}
+
+/* AI STATUS BADGE */
+#ai-status-badge{position:absolute;right:12px;bottom:-10px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;border:1.5px solid;letter-spacing:.04em;text-transform:uppercase;}
+#ai-status-badge.gemini{background:#e8f5e9;color:#16a34a;border-color:#86efac;}
+#ai-status-badge.pollinations{background:#fef3c7;color:#b45309;border-color:#fcd34d;}
+#ai-status-badge.offline{background:#fee2e2;color:#dc2626;border-color:#fca5a5;}
+
+/* BOTTOM NAV */
+#bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:var(--bg1);border-top:1.5px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 16px rgba(91,78,248,.07);}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;user-select:none;position:relative;-webkit-tap-highlight-color:transparent;}
+.nb-pip{width:38px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .18s;}
+.nb-label{font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--t3);transition:color .18s;}
+.nb.on .nb-pip{background:var(--pdim);}
+.nb.on .nb-label{color:var(--p);}
+.nb:active .nb-pip{transform:scale(.86);}
+.nb-badge{position:absolute;top:5px;right:calc(50% - 22px);width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--bg1);display:none;}
+.nb-badge.on{display:block;}
+
+/* SCREENS */
+#screens{position:fixed;top:var(--top);bottom:var(--nav);left:0;right:0;overflow:hidden;}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:var(--bg);}
+.screen.on{display:flex;}
+
+/* EDITOR */
+#ed-tabs{height:40px;display:flex;align-items:flex-end;padding:0 8px;gap:3px;overflow-x:auto;background:var(--bg1);border-bottom:1.5px solid var(--border);flex-shrink:0;}
+#ed-tabs::-webkit-scrollbar{display:none;}
+.tab{height:33px;padding:0 11px;display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);cursor:pointer;border-radius:8px 8px 0 0;border:1.5px solid transparent;border-bottom:none;white-space:nowrap;flex-shrink:0;transition:all .15s;user-select:none;}
+.tab.on{color:var(--p);background:var(--bg);border-color:var(--border);border-bottom-color:var(--bg);font-weight:600;}
+.tab-x{font-size:15px;padding:0 2px;line-height:1;}
+.tab-x:active{color:var(--red);}
+#add-tab{height:33px;padding:0 12px;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--p);cursor:pointer;flex-shrink:0;border-radius:8px;border:1.5px dashed var(--pring);margin-bottom:1px;background:var(--pdim);white-space:nowrap;}
+#add-tab:active{background:var(--p);color:#fff;border-style:solid;}
+
+#ed-actions{height:40px;display:flex;align-items:center;padding:0 10px;gap:6px;background:var(--bg1);border-bottom:1.5px solid var(--border);flex-shrink:0;overflow-x:auto;}
+#ed-actions::-webkit-scrollbar{display:none;}
+.ea{height:30px;padding:0 11px;background:var(--bg2);border:1.5px solid var(--border);border-radius:7px;color:var(--t2);font-family:'Plus Jakarta Sans',sans-serif;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:5px;transition:all .12s;}
+.ea:active{background:var(--pdim);border-color:var(--p);color:var(--p);}
+.ea.danger{color:var(--red);}
+.ea.danger:active{background:#fef2f2;border-color:var(--red);}
+.ea-sep{width:1.5px;height:18px;background:var(--border);flex-shrink:0;}
+
+#ed-wrap{flex:1;overflow:hidden;background:#fff;position:relative;}
+.CodeMirror{height:100%!important;font-family:'JetBrains Mono',monospace!important;font-size:13.5px!important;line-height:1.8!important;background:#fff!important;color:#1a1b2e!important;}
+.CodeMirror-gutters{background:#f7f8fc!important;border-right:1.5px solid var(--border)!important;min-width:44px!important;}
+.CodeMirror-linenumber{color:#b0b5d0!important;font-size:11px!important;padding:0 10px!important;}
+.CodeMirror-activeline-background{background:#f0f2fc!important;}
+.CodeMirror-cursor{border-left:2.5px solid var(--p)!important;}
+.CodeMirror-selected{background:rgba(91,78,248,.12)!important;}
+.CodeMirror-scroll{padding-bottom:100px!important;}
+.cm-keyword{color:#7c3aed!important;font-weight:600!important;}
+.cm-def{color:#0284c7!important;}
+.cm-string{color:#16a34a!important;}
+.cm-number{color:#dc2626!important;}
+.cm-comment{color:#94a3b8!important;font-style:italic!important;}
+.cm-operator{color:#7c3aed!important;}
+.cm-property{color:#0369a1!important;}
+.cm-atom{color:#dc2626!important;}
+.cm-tag{color:#dc2626!important;font-weight:600!important;}
+.cm-attribute{color:#7c3aed!important;}
+.cm-builtin{color:#0284c7!important;font-weight:600!important;}
+
+#kbd-bar{height:44px;background:var(--bg1);border-top:1.5px solid var(--border);display:flex;align-items:center;padding:0 8px;gap:4px;overflow-x:auto;flex-shrink:0;}
+#kbd-bar::-webkit-scrollbar{display:none;}
+.kb{height:32px;padding:0 10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:7px;color:var(--t2);font-family:'JetBrains Mono',monospace;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;transition:all .12s;}
+.kb:active{background:var(--pdim);border-color:var(--p);color:var(--p);}
+.kb-sep{width:1.5px;height:18px;background:var(--border);flex-shrink:0;}
+
+/* PREVIEW */
+#prev-top{height:48px;display:flex;align-items:center;padding:0 12px;gap:8px;background:var(--bg1);border-bottom:1.5px solid var(--border);flex-shrink:0;}
+#prev-url{flex:1;display:flex;align-items:center;gap:8px;background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:7px 12px;min-width:0;}
+#prev-url-text{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prev-btn{height:34px;padding:0 12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;color:var(--t2);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.prev-btn:active{background:var(--pdim);border-color:var(--p);color:var(--p);}
+.prev-btn.primary{background:linear-gradient(135deg,var(--p),#7c6af7);color:#fff;border-color:transparent;box-shadow:0 2px 10px rgba(91,78,248,.3);}
+.prev-btn.primary:active{transform:scale(.93);}
+#prev-frame-wrap{flex:1;position:relative;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center;}
+#preview-frame{width:100%;height:100%;border:none;background:#fff;transition:all .3s;}
+#prev-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--t3);background:var(--bg);}
+.pe-icon{font-size:52px;opacity:.35;}
+.pe-text{font-size:15px;font-weight:700;color:var(--t2);}
+.pe-sub{font-size:12.5px;text-align:center;max-width:240px;line-height:1.5;}
+#prev-loading{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--p),#a78bfa);display:none;animation:slide 1s infinite;}
+@keyframes slide{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+#prev-device-bar{height:36px;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg1);border-top:1.5px solid var(--border);flex-shrink:0;}
+.dv-btn{height:26px;padding:0 10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:6px;color:var(--t3);font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;}
+.dv-btn.on{background:var(--pdim);border-color:var(--p);color:var(--p);}
+
+/* OUTPUT */
+#out-top{height:50px;display:flex;align-items:center;padding:0 14px;gap:8px;background:var(--bg1);border-bottom:1.5px solid var(--border);flex-shrink:0;}
+#out-title-w{flex:1;}
+#out-title{font-size:14px;font-weight:700;color:var(--text);}
+#out-sub{font-size:11px;color:var(--t3);margin-top:1px;}
+.oa{background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;color:var(--t2);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;padding:7px 11px;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.oa:active{border-color:var(--p);color:var(--p);background:var(--pdim);}
+.oa.primary{background:linear-gradient(135deg,var(--p),#7c6af7);border-color:transparent;color:#fff;box-shadow:0 2px 10px rgba(91,78,248,.3);}
+.oa.primary:active{transform:scale(.93);}
+#out-log{flex:1;overflow-y:auto;padding:12px 14px;-webkit-overflow-scrolling:touch;}
+.ol{display:flex;gap:8px;padding:7px 11px;border-radius:8px;margin-bottom:4px;word-break:break-all;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.6;border-left:3px solid transparent;}
+.ol.log  {background:#f7f8fc;color:var(--t2);border-color:var(--border);}
+.ol.error{background:#fef2f2;color:#dc2626;border-color:#fca5a5;}
+.ol.warn {background:#fffbeb;color:#b45309;border-color:#fcd34d;}
+.ol.info {background:#f0f9ff;color:#0369a1;border-color:#7dd3fc;}
+.ol.result{background:#f0fdf4;color:#16a34a;border-color:#86efac;}
+.ol.system{color:var(--t3);font-style:italic;font-size:11.5px;padding:4px 11px;}
+.ol-ts{color:var(--t3);font-size:10px;flex-shrink:0;padding-top:2px;opacity:.7;}
+
+/* AI */
+#ai-top{height:50px;display:flex;align-items:center;padding:0 14px;gap:8px;background:var(--bg1);border-bottom:1.5px solid var(--border);flex-shrink:0;}
+#ai-title-w{flex:1;}
+#ai-title-main{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
+.ai-pill{font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:99px;}
+.ai-pill.groq{background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;}
+.ai-pill.gemini{background:#e8f5e9;color:#16a34a;border:1px solid #86efac;}
+.ai-pill.pollinations{background:#fef3c7;color:#b45309;border:1px solid #fcd34d;}
+.ai-pill.offline{background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;}
+#ai-model-label{font-size:11px;color:var(--t3);margin-top:1px;}
+.ctx-btn{background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;color:var(--t2);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;padding:7px 11px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.ctx-btn:active{border-color:var(--sky);color:var(--sky);background:rgba(14,165,233,.08);}
+#ai-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px;-webkit-overflow-scrolling:touch;}
+.ab{border-radius:14px;padding:11px 13px;font-size:13px;line-height:1.65;animation:pop .22s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pop{from{opacity:0;transform:scale(.94) translateY(6px)}to{opacity:1;transform:none}}
+.ab.user{background:linear-gradient(135deg,var(--p),#7c6af7);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;align-self:flex-end;max-width:88%;border-bottom-right-radius:4px;box-shadow:0 4px 14px rgba(91,78,248,.28);}
+.ab.bot{background:var(--bg1);border:1.5px solid var(--border);color:var(--t2);font-family:'JetBrains Mono',monospace;font-size:12px;border-bottom-left-radius:4px;white-space:pre-wrap;box-shadow:var(--shadow);}
+.ab.think{background:none;border:none;padding:4px 2px;color:var(--t3);font-style:italic;font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:8px;}
+.ab pre{background:var(--bg3);border-radius:8px;padding:11px;margin-top:8px;overflow-x:auto;font-size:11px;border:1.5px solid var(--border);}
+.ab .src-tag{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
+.src-gemini{background:#e8f5e9;color:#16a34a;}
+.src-pollinations{background:#fef3c7;color:#b45309;}
+.dots span{display:inline-block;width:6px;height:6px;background:var(--p);border-radius:50%;margin:0 2px;animation:bounce 1.2s infinite;opacity:.5;}
+.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+#ai-inp{padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));border-top:1.5px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:var(--bg1);flex-shrink:0;}
+#ai-ta{flex:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;padding:10px 13px;outline:none;resize:none;min-height:44px;max-height:120px;line-height:1.5;transition:all .18s;-webkit-appearance:none;}
+#ai-ta:focus{border-color:var(--p);background:#fff;box-shadow:0 0 0 3px var(--pring);}
+#ai-ta::placeholder{color:var(--t3);}
+#ai-go{width:44px;height:44px;background:linear-gradient(135deg,var(--p),#7c6af7);border:none;border-radius:12px;color:#fff;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(91,78,248,.35);transition:all .18s;}
+#ai-go:active{transform:scale(.9);}
+#ai-go:disabled{opacity:.4;box-shadow:none;}
+.ai-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.chip{background:var(--bg2);border:1.5px solid var(--border);border-radius:99px;color:var(--t2);font-size:11.5px;font-weight:600;padding:5px 11px;cursor:pointer;transition:all .15s;}
+.chip:active{background:var(--pdim);border-color:var(--p);color:var(--p);}
+
+/* MODALS */
+.modal-bg{position:fixed;inset:0;z-index:400;display:none;align-items:flex-end;justify-content:center;background:rgba(30,27,60,.45);backdrop-filter:blur(6px);padding-bottom:env(safe-area-inset-bottom);}
+.modal-bg.on{display:flex;animation:fo .2s ease;}
+@keyframes fo{from{opacity:0}to{opacity:1}}
+.msheet{background:var(--bg1);border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:20px 20px 28px;box-shadow:0 -8px 40px rgba(91,78,248,.15);animation:slideUp .28s cubic-bezier(.34,1.4,.64,1);}
+@keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+.mhandle{width:40px;height:4px;background:var(--bg4);border-radius:99px;margin:0 auto 18px;}
+.micon{font-size:38px;text-align:center;margin-bottom:10px;}
+.mtitle{font-size:18px;font-weight:800;color:var(--text);text-align:center;margin-bottom:6px;}
+.msub{font-size:13px;color:var(--t2);text-align:center;line-height:1.5;margin-bottom:18px;}
+.mlabel{font-size:11.5px;font-weight:700;color:var(--t2);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase;display:block;}
+.minput{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;padding:12px 14px;outline:none;transition:all .18s;-webkit-appearance:none;margin-bottom:12px;}
+.minput:focus{border-color:var(--p);box-shadow:0 0 0 3px var(--pring);}
+.ext-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;}
+.ext-opt{height:50px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;gap:2px;}
+.ext-opt.sel{background:var(--pdim);border-color:var(--p);}
+.ext-opt:active{transform:scale(.93);}
+.eo-emoji{font-size:18px;}
+.eo-label{font-size:10px;font-weight:700;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.ext-opt.sel .eo-label{color:var(--p);}
+.mbtns{display:flex;gap:10px;margin-top:6px;}
+.mbtn{flex:1;height:48px;border-radius:14px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;cursor:pointer;border:none;transition:all .15s;}
+.mbtn.cancel{background:var(--bg3);color:var(--t2);}
+.mbtn.cancel:active{background:var(--bg4);}
+.mbtn.ok{background:linear-gradient(135deg,var(--p),#7c6af7);color:#fff;box-shadow:0 3px 12px rgba(91,78,248,.35);}
+.mbtn.ok:active{transform:scale(.96);}
+.mbtn.del{background:linear-gradient(135deg,var(--red),#f87171);color:#fff;box-shadow:0 3px 12px rgba(239,68,68,.3);}
+.mbtn.del:active{transform:scale(.96);}
+.fname-chip{display:inline-block;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;padding:4px 12px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--p);font-weight:600;margin-bottom:16px;}
+
+/* DRAWER */
+#ov{position:fixed;inset:0;background:rgba(30,27,60,.35);z-index:200;display:none;backdrop-filter:blur(4px);}
+#ov.on{display:block;animation:fo .2s ease;}
+#drawer{position:fixed;top:0;left:0;bottom:0;width:min(290px,88vw);background:var(--bg1);border-right:1.5px solid var(--border);z-index:201;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .26s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 30px rgba(91,78,248,.12);}
+#drawer.on{transform:translateX(0);}
+#dw-head{height:58px;display:flex;align-items:center;padding:0 16px;gap:10px;border-bottom:1.5px solid var(--border);flex-shrink:0;background:linear-gradient(135deg,var(--p),#7c6af7);}
+#dw-title{font-weight:700;font-size:14px;color:#fff;flex:1;}
+#new-btn2{background:rgba(255,255,255,.22);border:1.5px solid rgba(255,255,255,.5);border-radius:9px;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;padding:7px 14px;cursor:pointer;transition:all .15s;}
+#new-btn2:active{background:rgba(255,255,255,.4);}
+#flist{flex:1;overflow-y:auto;padding:10px 8px;}
+.fi{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;cursor:pointer;transition:all .15s;user-select:none;margin-bottom:3px;}
+.fi:active{background:var(--bg3);}
+.fi.on{background:var(--pdim);border:1.5px solid var(--pring);}
+.fi-badge{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;font-family:'JetBrains Mono',monospace;}
+.fi-info{flex:1;min-width:0;}
+.fi-name{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fi.on .fi-name{color:var(--p);font-weight:600;}
+.fi-meta{font-size:10px;color:var(--t3);margin-top:1px;}
+.fi-del{background:none;border:none;color:var(--t3);font-size:18px;cursor:pointer;padding:5px 7px;border-radius:6px;transition:all .12s;line-height:1;}
+.fi-del:active{color:var(--red);background:#fef2f2;}
+
+/* Empty */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--t3);padding:20px;text-align:center;}
+.es-icon{font-size:50px;opacity:.35;}
+.es-text{font-size:15px;font-weight:700;color:var(--t2);}
+.es-sub{font-size:12.5px;line-height:1.5;max-width:240px;}
+
+/* Toast */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);background:#1a1b2e;color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:600;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transition:all .25s;white-space:nowrap;pointer-events:none;font-family:'Plus Jakarta Sans',sans-serif;}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+*{scrollbar-width:thin;scrollbar-color:var(--bg4) transparent;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px;}
+
+/* DESKTOP */
+@media(min-width:768px){
+  :root{--nav:0px;--top:46px;}
+  #bnav{display:none;}
+  #screens{bottom:0;display:flex;flex-direction:row;}
+  .screen{position:relative;display:flex!important;}
+  #ed-screen{flex:1.3;border-right:1.5px solid var(--border);}
+  #prev-screen{flex:1.2;border-right:1.5px solid var(--border);}
+  #out-screen{flex:.75;border-right:1.5px solid var(--border);}
+  #ai-screen{flex:1;}
+  .modal-bg{align-items:center;padding:0;}
+  .msheet{border-radius:20px;max-width:380px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <span class="logo-text">VOID</span>
+  </div>
+  <div id="file-chip" onclick="openDrawer()">
+    <span id="chip-icon" style="font-size:13px">🟧</span>
+    <span id="chip-name">index.html</span>
+    <span style="font-size:10px;color:var(--t3);flex-shrink:0;margin-left:2px">▾</span>
+  </div>
+  <button id="run-btn" onclick="runCode()">▶ Run</button>
+</div>
+
+<div id="screens">
+  <!-- EDITOR -->
+  <div class="screen on" id="ed-screen">
+    <div id="ed-tabs">
+      <div id="add-tab" onclick="openNewModal()">＋ New</div>
+    </div>
+    <div id="ed-actions">
+      <button class="ea danger" onclick="openClearModal()">🗑 Hapus Semua</button>
+      <div class="ea-sep"></div>
+      <button class="ea" onclick="copyAll()">📋 Copy</button>
+      <button class="ea" onclick="insertTemplate()">📄 Template</button>
+      <div class="ea-sep"></div>
+      <button class="ea" onclick="wrapInFunc()">⚡ Wrap fn</button>
+      <div class="ea-sep"></div>
+      <button class="ea" onclick="ed.undo();ed.focus()">↩</button>
+      <button class="ea" onclick="ed.redo();ed.focus()">↪</button>
+    </div>
+    <div id="ed-wrap"><textarea id="cm"></textarea></div>
+    <div id="kbd-bar">
+      <button class="kb" onclick="ins('  ')">⇥</button>
+      <div class="kb-sep"></div>
+      <button class="kb" onclick="pair('()')">( )</button>
+      <button class="kb" onclick="pair('[]')">[  ]</button>
+      <button class="kb" onclick="pair('{}')">{  }</button>
+      <button class="kb" onclick="pair(&quot;''&quot;)">''</button>
+      <button class="kb" onclick="pair('``')">``</button>
+      <div class="kb-sep"></div>
+      <button class="kb" onclick="ins('=>')">=&gt;</button>
+      <button class="kb" onclick="ins('console.log()')">log</button>
+      <button class="kb" onclick="cmt()">//</button>
+      <div class="kb-sep"></div>
+      <button class="kb" onclick="moveLine(-1)">↑</button>
+      <button class="kb" onclick="moveLine(1)">↓</button>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="screen" id="prev-screen">
+    <div id="prev-top">
+      <div id="prev-url">
+        <span>🌐</span>
+        <span id="prev-url-text">Belum ada preview</span>
+      </div>
+      <button class="prev-btn" onclick="refreshPreview()">↺</button>
+      <button class="prev-btn primary" onclick="runCode()">▶ Run</button>
+    </div>
+    <div id="prev-frame-wrap">
+      <div id="prev-loading"></div>
+      <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin allow-modals allow-forms"></iframe>
+      <div id="prev-empty">
+        <div class="pe-icon">🖥️</div>
+        <div class="pe-text">Preview kosong</div>
+        <div class="pe-sub">Buka file HTML lalu tap ▶ Run</div>
+      </div>
+    </div>
+    <div id="prev-device-bar">
+      <button class="dv-btn on" id="dv-full" onclick="setDevice('full')">💻 Full</button>
+      <button class="dv-btn" id="dv-mobile" onclick="setDevice('mobile')">📱 375px</button>
+      <button class="dv-btn" id="dv-tablet" onclick="setDevice('tablet')">📟 768px</button>
+    </div>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="screen" id="out-screen">
+    <div id="out-top">
+      <div id="out-title-w">
+        <div id="out-title">Console</div>
+        <div id="out-sub">Hasil JS & log</div>
+      </div>
+      <button class="oa" onclick="clearOut()">🗑</button>
+      <button class="oa primary" onclick="runCode()">▶ Run</button>
+    </div>
+    <div id="out-log">
+      <div class="empty-state" id="out-empty">
+        <div class="es-icon">⚡</div>
+        <div class="es-text">Belum ada output</div>
+        <div class="es-sub">Tap ▶ Run untuk jalankan JS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI -->
+  <div class="screen" id="ai-screen">
+    <div id="ai-top">
+      <div id="ai-title-w">
+        <div id="ai-title-main">
+          AI
+          <span class="ai-pill groq" id="ai-provider-badge">Groq</span>
+        </div>
+        <div id="ai-model-label">llama-3.1-8b-instant</div>
+      </div>
+      <button class="ctx-btn" onclick="attachCode()">📎 Kode</button>
+    </div>
+    <div id="ai-msgs">
+      <div class="ab bot" style="border-color:rgba(91,78,248,.18);background:rgba(91,78,248,.04)">Halo! Saya <strong style="color:var(--p)">VOID AI</strong> 👋
+
+Menggunakan <strong style="color:#6d28d9">Groq / Llama 3.1</strong> sebagai AI utama ⚡<br>Backup otomatis ke <strong style="color:#b45309">Pollinations</strong> jika Groq gagal.
+
+Saya bisa bantu:
+• 🔍 Jelaskan &amp; analisis kode
+• 🐛 Debug error
+• ✨ Tulis fungsi baru
+• 🚀 Refactor &amp; optimasi
+
+<div class="ai-chips">
+  <span class="chip" onclick="quickAsk('Jelaskan kode ini')">🔍 Jelaskan</span>
+  <span class="chip" onclick="quickAsk('Ada bug di kode ini?')">🐛 Cek bug</span>
+  <span class="chip" onclick="quickAsk('Cara optimasi kode ini?')">🚀 Optimasi</span>
+  <span class="chip" onclick="quickAsk('Tambahkan komentar pada kode ini')">💬 Komentar</span>
+</div></div>
+    </div>
+    <div id="ai-inp">
+      <textarea id="ai-ta" placeholder="Tanya tentang kode..." rows="1" oninput="resize(this)"></textarea>
+      <button id="ai-go" onclick="sendAI()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="bnav">
+  <div class="nb on" id="nb-ed" onclick="go('ed')">
+    <div class="nb-pip">✏️</div><span class="nb-label">Editor</span>
+  </div>
+  <div class="nb" id="nb-prev" onclick="go('prev')">
+    <div class="nb-pip">🖥️</div><span class="nb-label">Preview</span>
+    <div class="nb-badge" id="prev-badge"></div>
+  </div>
+  <div class="nb" id="nb-out" onclick="go('out')">
+    <div class="nb-pip">⚡</div><span class="nb-label">Output</span>
+    <div class="nb-badge" id="out-badge"></div>
+  </div>
+  <div class="nb" id="nb-ai" onclick="go('ai')">
+    <div class="nb-pip">🤖</div><span class="nb-label">AI</span>
+    <div class="nb-badge" id="ai-badge"></div>
+  </div>
+</div>
+
+<!-- MODAL: NEW FILE -->
+<div class="modal-bg" id="modal-new">
+  <div class="msheet" onclick="event.stopPropagation()">
+    <div class="mhandle"></div>
+    <div class="micon">📄</div>
+    <div class="mtitle">File Baru</div>
+    <div class="msub">Beri nama dan pilih jenis file</div>
+    <label class="mlabel">Nama File</label>
+    <input class="minput" id="new-name" placeholder="contoh: index" oninput="this.value=this.value.replace(/[^a-zA-Z0-9_-]/g,'')">
+    <label class="mlabel">Tipe File</label>
+    <div class="ext-grid">
+      <div class="ext-opt sel" data-ext="html" onclick="selExt(this)"><span class="eo-emoji">🟧</span><span class="eo-label">.html</span></div>
+      <div class="ext-opt" data-ext="css" onclick="selExt(this)"><span class="eo-emoji">🟪</span><span class="eo-label">.css</span></div>
+      <div class="ext-opt" data-ext="js" onclick="selExt(this)"><span class="eo-emoji">🟨</span><span class="eo-label">.js</span></div>
+      <div class="ext-opt" data-ext="py" onclick="selExt(this)"><span class="eo-emoji">🟩</span><span class="eo-label">.py</span></div>
+    </div>
+    <div class="mbtns">
+      <button class="mbtn cancel" onclick="closeModal('modal-new')">Batal</button>
+      <button class="mbtn ok" onclick="doNewFile()">✅ Buat File</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CLEAR -->
+<div class="modal-bg" id="modal-clear">
+  <div class="msheet" onclick="event.stopPropagation()">
+    <div class="mhandle"></div>
+    <div class="micon">🗑️</div>
+    <div class="mtitle">Hapus Semua Kode?</div>
+    <div class="msub">Semua kode di file ini akan langsung terhapus.</div>
+    <div style="text-align:center;margin-bottom:18px"><span class="fname-chip" id="clear-fname">index.html</span></div>
+    <div class="mbtns">
+      <button class="mbtn cancel" onclick="closeModal('modal-clear')">Batal</button>
+      <button class="mbtn del" onclick="doClear()">🗑 Hapus Sekarang</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: WRAP FN -->
+<div class="modal-bg" id="modal-wrap">
+  <div class="msheet" onclick="event.stopPropagation()">
+    <div class="mhandle"></div>
+    <div class="micon">⚡</div>
+    <div class="mtitle">Wrap Fungsi</div>
+    <div class="msub">Kode yang dipilih akan dibungkus dalam sebuah fungsi</div>
+    <label class="mlabel">Nama Fungsi</label>
+    <input class="minput" id="wrap-name" placeholder="myFunction">
+    <div class="mbtns">
+      <button class="mbtn cancel" onclick="closeModal('modal-wrap')">Batal</button>
+      <button class="mbtn ok" onclick="doWrap()">⚡ Wrap</button>
+    </div>
+  </div>
+</div>
+
+<!-- FILE DRAWER -->
+<div id="ov" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div id="dw-head">
+    <span id="dw-title">📁 Files</span>
+    <button id="new-btn2" onclick="openNewModal();closeDrawer()">＋ New</button>
+  </div>
+  <div id="flist"></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ══ CONFIG ══
+const GROQ_KEY = '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';
+
+// ══ DATA ══
+const EXT_COL  = {js:'#f59e0b',ts:'#0ea5e9',html:'#ef4444',css:'#8b5cf6',py:'#22c55e',json:'#6b7280'};
+const EXT_ICON = {js:'JS',ts:'TS',html:'HT',css:'CS',py:'PY',json:'{}'};
+const EXT_MODE = {js:'javascript',ts:'javascript',html:'htmlmixed',css:'css',py:'python'};
+const EMOJI    = {js:'🟨',ts:'🟦',html:'🟧',css:'🟪',py:'🟩',json:'⬜'};
+const TMPLS    = {
+  html:`<!DOCTYPE html>\n<html lang="id">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Halaman Baru</title>\n  <style>\n    * { box-sizing: border-box; margin: 0; padding: 0; }\n    body {\n      font-family: sans-serif;\n      background: #f0f2f8;\n      color: #1a1b2e;\n      padding: 40px 20px;\n    }\n    h1 { color: #5b4ef8; margin-bottom: 12px; }\n  </style>\n</head>\n<body>\n  <h1>Hello World! 👋</h1>\n  <p>Tulis konten di sini.</p>\n</body>\n</html>`,
+  js:`'use strict';\n\n// ── Main ──\nfunction main() {\n  console.log('App started! 🚀');\n}\n\nmain();`,
+  css:`/* Stylesheet */\n\n:root {\n  --primary: #5b4ef8;\n  --bg: #f0f2f8;\n  --text: #1a1b2e;\n}\n\nbody {\n  font-family: sans-serif;\n  background: var(--bg);\n  color: var(--text);\n  padding: 20px;\n}`
+};
+
+let files = [
+  {id:1,name:'index',ext:'html',content:`<!DOCTYPE html>\n<html lang="id">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>My App ✨</title>\n  <style>\n    * { box-sizing:border-box; margin:0; padding:0; }\n    body {\n      font-family: 'Plus Jakarta Sans', sans-serif;\n      background: linear-gradient(135deg, #f0f2f8, #e8eaf6);\n      min-height: 100vh;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      padding: 20px;\n    }\n    .card {\n      background: white;\n      border-radius: 20px;\n      padding: 40px;\n      box-shadow: 0 20px 60px rgba(91,78,248,0.15);\n      text-align: center;\n      max-width: 400px;\n      width: 100%;\n    }\n    h1 { color: #5b4ef8; font-size: 1.8rem; margin-bottom: 12px; }\n    p  { color: #5a5d7a; margin-bottom: 24px; line-height: 1.6; }\n    .counter { font-size: 3rem; font-weight: 800; color: #5b4ef8; margin: 16px 0; }\n    .btn {\n      background: linear-gradient(135deg, #5b4ef8, #7c6af7);\n      border: none; color: white;\n      padding: 14px 28px; border-radius: 12px;\n      font-size: 15px; font-weight: 600; cursor: pointer;\n      box-shadow: 0 4px 14px rgba(91,78,248,.35);\n      transition: transform 0.2s;\n    }\n    .btn:hover { transform: translateY(-2px); }\n  </style>\n</head>\n<body>\n  <div class="card">\n    <h1>Hello VOID! 🚀</h1>\n    <p>Preview langsung dari kode kamu.<br>Tap ▶ Run untuk melihat perubahan!</p>\n    <div class="counter" id="count">0</div>\n    <button class="btn" onclick="increment()">Klik Saya! 🎉</button>\n  </div>\n  <script>\n    let n = 0;\n    function increment() {\n      n++;\n      document.getElementById('count').textContent = n;\n    }\n  <\\/script>\n</body>\n</html>`},
+  {id:2,name:'app',ext:'js',content:`// VOID IDE — JavaScript\n// Ctrl+Enter atau ▶ Run\n\nconst nums = [3,1,4,1,5,9,2,6];\nconsole.log('Sorted:', [...nums].sort((a,b)=>a-b));\nconsole.log('Unique:', [...new Set(nums)]);\nconsole.log('Sum:', nums.reduce((a,b)=>a+b,0));\n\nconst greet = name => \`Halo, \${name}! 👋\`;\nconsole.log(greet('Dunia'));\n`}
+];
+
+let AID=1, ed, aiHist=[], nid=3, cur='ed', selExt_val='html';
+
+const gf = (id=AID) => files.find(f=>f.id===id);
+
+// ══ INIT ══
+document.addEventListener('DOMContentLoaded', () => {
+  ed = CodeMirror.fromTextArea(document.getElementById('cm'), {
+    lineNumbers:true, autoCloseBrackets:true, matchBrackets:true,
+    styleActiveLine:true, indentUnit:2, tabSize:2, lineWrapping:true,
+    extraKeys:{
+      'Ctrl-Enter':runCode,'Cmd-Enter':runCode,
+      'Tab':cm=>cm.somethingSelected()?cm.indentSelection('add'):cm.replaceSelection('  ')
+    }
+  });
+  ed.on('change', ()=>{ const f=gf(); if(f) f.content=ed.getValue(); });
+  renderTabs(); renderList(); load(1);
+  document.addEventListener('keydown', e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); runCode(); }
+    if(e.key==='Escape') closeAllModals();
+  });
+  document.getElementById('ai-ta').addEventListener('keydown', e=>{
+    if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendAI(); }
+  });
+});
+
+// ══ FILE OPS ══
+function load(id){
+  AID=id; const f=gf(); if(!f)return;
+  ed.setValue(f.content);
+  ed.setOption('mode', EXT_MODE[f.ext]||'javascript');
+  document.getElementById('chip-name').textContent=`${f.name}.${f.ext}`;
+  document.getElementById('chip-icon').textContent=EMOJI[f.ext]||'📄';
+  setTimeout(()=>ed.refresh(),10);
+  renderTabs(); renderList();
+}
+
+function renderTabs(){
+  const c=document.getElementById('ed-tabs'), a=document.getElementById('add-tab');
+  Array.from(c.children).forEach(el=>{ if(el!==a)el.remove(); });
+  files.forEach(f=>{
+    const t=document.createElement('div'); t.className='tab'+(f.id===AID?' on':'');
+    t.innerHTML=`<span style="font-size:11px">${EMOJI[f.ext]||'📄'}</span>${f.name}<span style="opacity:.4">.${f.ext}</span><span class="tab-x" onclick="closeF(${f.id},event)">×</span>`;
+    t.addEventListener('click', e=>{ if(!e.target.classList.contains('tab-x')){ load(f.id); closeDrawer(); }});
+    c.insertBefore(t,a);
+  });
+}
+
+function closeF(id,e){
+  e.stopPropagation(); if(files.length===1)return;
+  files=files.filter(f=>f.id!==id);
+  if(AID===id) load(files[files.length-1].id); else{ renderTabs(); renderList(); }
+}
+
+function renderList(){
+  const c=document.getElementById('flist'); c.innerHTML='';
+  files.forEach(f=>{
+    const lines=f.content.split('\n').length;
+    const kb=(f.content.length/1024).toFixed(1);
+    const el=document.createElement('div'); el.className='fi'+(f.id===AID?' on':'');
+    el.innerHTML=`
+      <div class="fi-badge" style="background:${EXT_COL[f.ext]||'#6b7280'}">${EXT_ICON[f.ext]||'??'}</div>
+      <div class="fi-info">
+        <div class="fi-name">${f.name}.${f.ext}</div>
+        <div class="fi-meta">${lines} baris · ${kb} KB</div>
+      </div>
+      <button class="fi-del" onclick="delF(${f.id},event)">×</button>`;
+    el.addEventListener('click', ()=>{ load(f.id); closeDrawer(); go('ed'); });
+    c.appendChild(el);
+  });
+}
+
+function delF(id,e){
+  e.stopPropagation(); if(files.length===1){ toast('⚠️ Minimal 1 file'); return; }
+  // show custom confirm via clear modal reuse
+  const f=files.find(x=>x.id===id);
+  if(!f)return;
+  // quick inline delete without extra modal
+  files=files.filter(x=>x.id!==id);
+  if(AID===id) load(files[files.length-1].id); else renderList();
+  toast(`🗑 ${f.name}.${f.ext} dihapus`);
+}
+
+// ══ DRAWER ══
+function openDrawer(){ document.getElementById('ov').classList.add('on'); document.getElementById('drawer').classList.add('on'); renderList(); }
+function closeDrawer(){ document.getElementById('ov').classList.remove('on'); document.getElementById('drawer').classList.remove('on'); }
+
+// ══ NAV ══
+function go(t){
+  cur=t;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById(`${t}-screen`).classList.add('on');
+  document.getElementById(`nb-${t}`).classList.add('on');
+  if(t==='ed') setTimeout(()=>ed.refresh(),50);
+  if(t==='out') document.getElementById('out-badge').classList.remove('on');
+  if(t==='prev') document.getElementById('prev-badge').classList.remove('on');
+  if(t==='ai') document.getElementById('ai-badge').classList.remove('on');
+}
+
+// ══ MODALS ══
+function openModal(id){ document.getElementById(id).classList.add('on'); }
+function closeModal(id){ document.getElementById(id).classList.remove('on'); }
+function closeAllModals(){ document.querySelectorAll('.modal-bg').forEach(m=>m.classList.remove('on')); }
+
+// Close modal on bg click
+document.querySelectorAll && setTimeout(()=>{
+  document.querySelectorAll('.modal-bg').forEach(m=>{
+    m.addEventListener('click', e=>{ if(e.target===m) m.classList.remove('on'); });
+  });
+},100);
+
+// NEW FILE MODAL
+function openNewModal(){
+  document.getElementById('new-name').value='';
+  selExt_val='html';
+  document.querySelectorAll('.ext-opt').forEach(o=>o.classList.remove('sel'));
+  document.querySelector('[data-ext="html"]').classList.add('sel');
+  openModal('modal-new');
+  setTimeout(()=>document.getElementById('new-name').focus(),300);
+}
+
+function selExt(el){
+  document.querySelectorAll('.ext-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  selExt_val = el.dataset.ext;
+}
+
+function doNewFile(){
+  const name = document.getElementById('new-name').value.trim();
+  if(!name){ toast('⚠️ Nama file tidak boleh kosong'); return; }
+  const ext = selExt_val;
+  const f = { id:nid++, name, ext, content: TMPLS[ext]||`// ${name}.${ext}\n` };
+  files.push(f);
+  closeModal('modal-new');
+  renderTabs(); renderList(); load(f.id);
+  toast(`✅ ${name}.${ext} dibuat!`);
+}
+
+// CLEAR MODAL
+function openClearModal(){
+  const f=gf();
+  document.getElementById('clear-fname').textContent=`${f.name}.${f.ext}`;
+  openModal('modal-clear');
+}
+function doClear(){
+  ed.setValue(''); ed.focus();
+  const f=gf(); if(f)f.content='';
+  closeModal('modal-clear');
+  toast('🗑 Kode dihapus!');
+}
+
+// WRAP FN MODAL
+function wrapInFunc(){
+  const sel=ed.getSelection();
+  if(!sel){ toast('⚠️ Pilih kode dulu baru wrap'); return; }
+  document.getElementById('wrap-name').value='myFunction';
+  openModal('modal-wrap');
+  setTimeout(()=>document.getElementById('wrap-name').focus(),300);
+}
+function doWrap(){
+  const name=document.getElementById('wrap-name').value.trim()||'myFunction';
+  const sel=ed.getSelection();
+  ed.replaceSelection(`function ${name}() {\n  ${sel.split('\n').join('\n  ')}\n}`);
+  closeModal('modal-wrap');
+  toast(`⚡ Dibungkus jadi ${name}()`);
+}
+
+// ══ RUN ══
+function runCode(){
+  const f=gf(); const code=ed.getValue();
+  if(f.ext==='html'){
+    runPreview(code); badge('prev');
+    if(window.innerWidth<768) go('prev');
+  } else if(f.ext==='css'){
+    toast('⚠️ CSS preview lewat file HTML');
+  } else if(f.ext==='py'){
+    toast('⚠️ Python butuh backend server');
+  } else {
+    runJS(code);
+  }
+}
+
+function runPreview(html){
+  const frame=document.getElementById('preview-frame');
+  const empty=document.getElementById('prev-empty'); if(empty) empty.style.display='none';
+  const loading=document.getElementById('prev-loading'); loading.style.display='block';
+  frame.srcdoc=html;
+  frame.onload=()=>{ loading.style.display='none'; };
+  document.getElementById('prev-url-text').textContent=`${gf().name}.${gf().ext} — Live Preview`;
+}
+
+function refreshPreview(){
+  const f=gf(); if(f.ext==='html') runPreview(ed.getValue());
+}
+
+function setDevice(mode){
+  const wrap=document.getElementById('prev-frame-wrap');
+  const frame=document.getElementById('preview-frame');
+  document.querySelectorAll('.dv-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById(`dv-${mode}`).classList.add('on');
+  if(mode==='full'){ frame.style.cssText='width:100%;height:100%;border:none;'; wrap.style.cssText='flex:1;position:relative;overflow:hidden;background:#fff;display:block;'; }
+  if(mode==='mobile'){ wrap.style.cssText='flex:1;position:relative;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;'; frame.style.cssText='width:375px;max-height:100%;height:100%;border:none;border-radius:16px;box-shadow:0 0 0 8px #1a1b2e,0 20px 40px rgba(0,0,0,.3);'; }
+  if(mode==='tablet'){ wrap.style.cssText='flex:1;position:relative;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;'; frame.style.cssText='width:768px;max-height:100%;height:100%;border:none;border-radius:12px;box-shadow:0 0 0 6px #1a1b2e,0 16px 32px rgba(0,0,0,.25);'; }
+}
+
+function runJS(code){
+  const emp=document.getElementById('out-empty'); if(emp) emp.style.display='none';
+  clearOut(false); lg('system',`▶ Running ${gf().name}.${gf().ext}...`);
+  const oc=console.log,ow=console.warn,oe=console.error,oi=console.info;
+  console.log=(...a)=>{oc(...a);lg('log',a.map(sv).join(' '));};
+  console.warn=(...a)=>{ow(...a);lg('warn',a.map(sv).join(' '));};
+  console.error=(...a)=>{oe(...a);lg('error',a.map(sv).join(' '));};
+  console.info=(...a)=>{oi(...a);lg('info',a.map(sv).join(' '));};
+  try{
+    const r=eval(code);
+    if(r!==undefined) lg('result','→ '+sv(r));
+    lg('system','✅ Selesai.');
+  }catch(e){ lg('error',`❌ ${e.name}: ${e.message}`); }
+  finally{ console.log=oc;console.warn=ow;console.error=oe;console.info=oi; }
+  badge('out');
+  if(window.innerWidth<768) go('out');
+}
+
+function badge(t){ if(cur!==t) document.getElementById(`${t}-badge`).classList.add('on'); }
+function sv(v){ if(v===null)return'null'; if(typeof v==='object'){try{return JSON.stringify(v,null,2);}catch{}} return String(v); }
+function lg(type,msg){
+  const o=document.getElementById('out-log'), d=new Date();
+  const ts=`${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
+  const el=document.createElement('div'); el.className=`ol ${type}`;
+  el.innerHTML=`<span class="ol-ts">${ts}</span><span>${esc(msg)}</span>`;
+  o.appendChild(el); o.scrollTop=o.scrollHeight;
+}
+function clearOut(showEmpty=true){
+  document.getElementById('out-log').innerHTML='';
+  if(showEmpty){ const e=document.getElementById('out-empty'); if(e) e.style.display='flex'; }
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ══ EDITOR TOOLS ══
+function ins(s){ ed.replaceSelection(s); ed.focus(); }
+function pair(s){ ed.replaceSelection(s); const c=ed.getCursor(); ed.setCursor({line:c.line,ch:c.ch-1}); ed.focus(); }
+function cmt(){
+  const c=ed.getCursor(), line=ed.getLine(c.line), t=line.trimStart(), i=line.length-t.length;
+  if(t.startsWith('// ')) ed.replaceRange(line.slice(0,i)+t.slice(3),{line:c.line,ch:0},{line:c.line,ch:line.length});
+  else ed.replaceRange(line.slice(0,i)+'// '+t,{line:c.line,ch:0},{line:c.line,ch:line.length});
+  ed.focus();
+}
+function moveLine(dir){
+  const c=ed.getCursor(), ln=c.line, tot=ed.lineCount();
+  const tgt=ln+dir; if(tgt<0||tgt>=tot)return;
+  const cur=ed.getLine(ln), tgtL=ed.getLine(tgt);
+  ed.replaceRange(cur,{line:tgt,ch:0},{line:tgt,ch:tgtL.length});
+  ed.replaceRange(tgtL,{line:ln,ch:0},{line:ln,ch:cur.length});
+  ed.setCursor({line:tgt,ch:c.ch}); ed.focus();
+}
+async function copyAll(){
+  try{ await navigator.clipboard.writeText(ed.getValue()); toast('📋 Kode disalin!'); }
+  catch{ toast('❌ Gagal copy'); }
+}
+function insertTemplate(){
+  const f=gf(); const tmpl=TMPLS[f.ext];
+  if(!tmpl){ toast('⚠️ Tidak ada template untuk .'+f.ext); return; }
+  ed.setValue(tmpl); ed.focus(); toast('📄 Template diterapkan!');
+}
+function resize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+
+// ══ TOAST ══
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('on');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('on'),2200);
+}
+
+// ══ AI — Gemini primary, Pollinations backup ══
+function updateAIBadge(provider){
+  const badge=document.getElementById('ai-provider-badge');
+  const label=document.getElementById('ai-model-label');
+  const map = {
+    groq:         {cls:'ai-pill groq',        txt:'Groq',        sub:'llama-3.1-8b-instant'},
+    pollinations: {cls:'ai-pill pollinations', txt:'Pollinations', sub:'gpt-4o-mini'},
+    offline:      {cls:'ai-pill offline',  txt:'Offline', sub:'AI tidak tersedia'}
+  };
+  const p = map[provider] || map.offline;
+  badge.className=p.cls; badge.textContent=p.txt;
+  label.textContent=p.sub;
+}
+
+async function callGroq(messages){
+  const SYS = 'Kamu adalah VOID AI, asisten coding dalam web IDE. Jawab singkat, padat, dan helpful. Gunakan bahasa yang sama dengan user (Indonesia/English). Format kode dengan markdown backticks.';
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json', 'Authorization': `Bearer ${GROQ_KEY}`},
+    body: JSON.stringify({
+      model: 'llama-3.1-8b-instant',
+      messages: [{role:'system',content:SYS}, ...messages],
+      max_tokens: 1200, temperature: 0.7
+    })
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data?.error?.message || 'Groq HTTP ' + res.status);
+  return data.choices?.[0]?.message?.content || 'No response';
+}
+
+async function callPollinations(messages){
+  const SYS = 'Kamu adalah VOID AI, asisten coding. Jawab singkat, helpful. Gunakan bahasa yang sama dengan user. Format kode dengan markdown backticks.';
+  const res = await fetch('https://text.pollinations.ai/openai', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      messages: [{role:'system',content:SYS}, ...messages],
+      model: 'openai-large', private: true
+    })
+  });
+  if(!res.ok) throw new Error('Pollinations HTTP ' + res.status);
+  const data = await res.json();
+  const txt = data.choices?.[0]?.message?.content;
+  if(!txt) throw new Error('Pollinations empty response');
+  return txt;
+}
+
+function attachCode(){
+  const f=gf(), code=ed.getValue().slice(0,2000);
+  document.getElementById('ai-ta').value=`Tolong jelaskan kode ini:\n\`\`\`${f.ext}\n${code}\n\`\`\``;
+  resize(document.getElementById('ai-ta'));
+  document.getElementById('ai-ta').focus();
+  if(window.innerWidth<768) go('ai');
+}
+
+function quickAsk(prompt){
+  const f=gf(), code=ed.getValue().slice(0,1500);
+  document.getElementById('ai-ta').value=`${prompt}\n\n\`\`\`${f.ext}\n${code}\n\`\`\``;
+  resize(document.getElementById('ai-ta'));
+  if(window.innerWidth<768) go('ai');
+  sendAI();
+}
+
+async function sendAI(){
+  const ta=document.getElementById('ai-ta'), msg=ta.value.trim(); if(!msg)return;
+  const btn=document.getElementById('ai-go'); btn.disabled=true; ta.value=''; ta.style.height='auto';
+  bubble('user',msg); aiHist.push({role:'user',content:msg});
+
+  const th=document.createElement('div'); th.className='ab think';
+  th.innerHTML=`<div class="dots"><span></span><span></span><span></span></div> Sedang berpikir...`;
+  document.getElementById('ai-msgs').appendChild(th); sAI();
+
+  let reply='', provider='gemini';
+
+  try {
+    reply = await callGroq(aiHist);
+    provider = 'groq';
+  } catch(e1) {
+    th.innerHTML = `<div class="dots"><span></span><span></span><span></span></div> Groq gagal, coba backup...`;
+    sAI();
+    try {
+      reply = await callPollinations(aiHist);
+      provider = 'pollinations';
+    } catch(e2) {
+      reply = `❌ AI tidak merespons.\n\nGroq: ${e1.message}\nPollinations: ${e2.message}`;
+      provider = 'offline';
+    }
+  }
+
+  th.remove();
+  updateAIBadge(provider);
+  aiHist.push({role:'assistant',content:reply});
+  bubble('bot', reply, provider);
+  badge('ai');
+  btn.disabled=false;
+}
+
+function bubble(role, text, provider=''){
+  const c=document.getElementById('ai-msgs'), el=document.createElement('div');
+  el.className=`ab ${role}`;
+  if(role==='bot'){
+    const srcTag = provider ? `<span class="src-tag src-${provider}">${provider==='gemini'?'✦ Gemini':'☁ Pollinations'}</span>\n` : '';
+    el.innerHTML = srcTag + text
+      .replace(/```(\w*)\n?([\s\S]*?)```/g, (_,l,code)=>`<pre><code>${esc(code.trim())}</code></pre>`)
+      .replace(/`([^`\n]+)`/g, (_,c)=>`<code style="background:var(--bg3);padding:1px 5px;border-radius:4px;color:var(--p);font-size:11px;border:1.5px solid var(--border)">${esc(c)}</code>`)
+      .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:var(--text)">$1</strong>')
+      .replace(/\n/g, '<br>');
+  } else {
+    el.textContent=text;
+  }
+  c.appendChild(el); sAI();
+}
+function sAI(){ const c=document.getElementById('ai-msgs'); setTimeout(()=>c.scrollTop=c.scrollHeight,50); }
+</script>
+</body>
+</html>
